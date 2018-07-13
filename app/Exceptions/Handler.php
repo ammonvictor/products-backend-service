@@ -22,8 +22,8 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontFlash = [
-        'password',
-        'password_confirmation',
+    'password',
+    'password_confirmation',
     ];
 
     /**
@@ -46,6 +46,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        return parent::render($request, $exception);
-    }
+        if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) 
+        {
+           return response()->json([
+              'message' => 'Resource not found'
+              ], 404);
+       }
+       
+       return parent::render($request, $exception);
+   }
 }
