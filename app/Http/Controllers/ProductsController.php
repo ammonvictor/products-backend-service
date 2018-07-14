@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Product;
 use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
+	function __construct()
+	{
+		$this->middleware('auth:api');
+	}
 	public function index()
 	{
-		return Product::paginate(25);
+		return Auth::user()->products;
+		// return Product::paginate(25);
 	}
 	
 	public function show(Product $product)
