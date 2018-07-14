@@ -15,7 +15,6 @@ class ProductsController extends Controller
 	public function index()
 	{
 		return Auth::user()->products;
-		// return Product::paginate(25);
 	}
 	
 	public function show(Product $product)
@@ -25,27 +24,27 @@ class ProductsController extends Controller
 	
 	public function store(Request $request)
 	{
-		$this->validate($request, [
+		$validatedData = $this->validate($request, [
 			'title' => 'required|unique:products|max:255',
 			'description' => 'required',
 			'price' => 'integer',
 			'availability' => 'boolean',
 			]);
-		$product = Product::create($request->all());
+		$product = Auth::user()->products()->create($validatedData);
 		
 		return response()->json($product, 201);
 	}
 	
 	public function update(Request $request, Product $product)
 	{
-		$product->update($request->all());
+		$prod = Auth::user()->products()->where('id', $product->id)->update($request->all());
 		
-		return response()->json($product, 200);
+		return response()->json($prod, 200);
 	}
 	
 	public function delete(Product $product)
 	{
-		$product->delete();
+		Auth::user()->products()->where('id', $product->id)->delete();
 		
 		return response()->json(null, 204);
 	}

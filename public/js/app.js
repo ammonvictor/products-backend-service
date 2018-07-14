@@ -47432,21 +47432,174 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	data: function data() {
 		return {
-			products: []
+			products: [],
+			active: null,
+			newProduct: {},
+			form: null
 		};
 	},
+
+	methods: {
+		fetchProducts: function fetchProducts() {
+			var _this = this;
+
+			__WEBPACK_IMPORTED_MODULE_0_axios___default()({
+				method: 'GET',
+				url: 'api/products',
+				headers: { Authorization: "Bearer " + localStorage.getItem('token') }
+			}).then(function (res) {
+				return _this.products = res.data;
+			}).catch(function (error) {
+				return console.log(error);
+			});
+		},
+		setActive: function setActive(product) {
+			this.active = product;
+		},
+		clearActive: function clearActive() {
+			this.active = null;
+		},
+		editProduct: function editProduct(product) {
+			this.newProduct = product;
+			this.newProduct.edit = true;
+			this.active = null;
+		},
+		saveProduct: function saveProduct() {
+			var vm = this;
+			if (this.newProduct.edit) {
+				console.log('Edit: saving to db');
+				delete this.newProduct.edit;
+				__WEBPACK_IMPORTED_MODULE_0_axios___default()({
+					method: 'PUT',
+					url: 'api/products/' + this.newProduct.id,
+					headers: { Authorization: "Bearer " + localStorage.getItem('token') },
+					data: this.newProduct
+				}).then(function (res) {
+					console.log(res);
+					vm.newProduct = {};
+					vm.form.reset();
+					vm.fetchProducts();
+				}).catch(function (error) {
+					return console.log(error);
+				});
+			} else {
+				console.log('Store: saving to db');
+				__WEBPACK_IMPORTED_MODULE_0_axios___default()({
+					method: 'POST',
+					url: 'api/products',
+					headers: { Authorization: "Bearer " + localStorage.getItem('token') },
+					data: this.newProduct
+				}).then(function (response) {
+					console.log(response);
+					vm.products.push(response.data);
+					vm.newProduct = {};
+					vm.form.reset();
+					vm.fetchProducts();
+				}).catch(function (error) {
+					return console.log(error);
+				});
+			}
+		},
+		deleteProduct: function deleteProduct(product) {
+			var vm = this;
+			__WEBPACK_IMPORTED_MODULE_0_axios___default()({
+				method: 'DELETE',
+				url: 'api/products/' + product.id,
+				headers: { Authorization: "Bearer " + localStorage.getItem('token') }
+			}).then(function (res) {
+				console.log(res);
+				vm.active = null;
+				vm.newProduct = {};
+				vm.form.reset();
+				vm.fetchProducts();
+			}).catch(function (error) {
+				return console.log(error);
+			});
+		},
+		resetForm: function resetForm() {
+			this.newProduct = {};
+			this.form.reset();
+		}
+	},
 	mounted: function mounted() {
-		__WEBPACK_IMPORTED_MODULE_0_axios___default()('/api/products').then(function (res) {
-			return console.log(res.data);
-		}).catch(function (error) {
-			return console.log(error);
-		});
+		this.fetchProducts();
+		this.form = document.querySelector('.new-product');
 	}
 });
 
@@ -47458,9 +47611,334 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("h1", [_vm._v("Products")])
+  return _c("div", { staticClass: "row" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-md-4" }, [
+      _c(
+        "div",
+        { staticClass: "list-group" },
+        _vm._l(_vm.products, function(product) {
+          return _c(
+            "a",
+            {
+              key: product.id,
+              staticClass: "list-group-item list-group-item-action",
+              attrs: { href: "#" },
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  _vm.setActive(product)
+                }
+              }
+            },
+            [_vm._v("\n\t\t\t\t" + _vm._s(product.title) + "\n\t\t\t")]
+          )
+        })
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-md-8" }, [
+      _vm.active
+        ? _c("div", { staticClass: "card" }, [
+            _c("h5", { staticClass: "card-header" }, [
+              _vm._v("\n\t\t\t\t" + _vm._s(_vm.active.title) + "\n\t\t\t\t"),
+              _c(
+                "button",
+                {
+                  staticClass: "close",
+                  attrs: { type: "button", "aria-label": "Close" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.clearActive($event)
+                    }
+                  }
+                },
+                [
+                  _c("span", { attrs: { "aria-hidden": "true" } }, [
+                    _vm._v("×")
+                  ])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("h5", { staticClass: "card-title" }, [
+                _vm._v(
+                  "Status: " +
+                    _vm._s(
+                      _vm.active.availability ? "Available" : "Out of Stock"
+                    )
+                )
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "card-text" }, [
+                _vm._v("Price: " + _vm._s(_vm.active.price))
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "card-text" }, [
+                _vm._v(_vm._s(_vm.active.description))
+              ]),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-primary",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      _vm.editProduct(_vm.active)
+                    }
+                  }
+                },
+                [_vm._v("Edit")]
+              ),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-danger",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      _vm.deleteProduct(_vm.active)
+                    }
+                  }
+                },
+                [_vm._v("Delete")]
+              )
+            ])
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c("div", { staticClass: "clearfix" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "card" }, [
+        _c("div", { staticClass: "card-header" }, [_vm._v("Add Product")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body" }, [
+          _c("form", { staticClass: "new-product" }, [
+            _c("div", { staticClass: "form-row" }, [
+              _c("div", { staticClass: "form-group col-md-6" }, [
+                _c("label", { attrs: { for: "title" } }, [_vm._v("Title")]),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.newProduct.title,
+                      expression: "newProduct.title"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", id: "title", placeholder: "Title" },
+                  domProps: { value: _vm.newProduct.title },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.newProduct, "title", $event.target.value)
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group col-md-6" }, [
+                _c("label", { attrs: { for: "price" } }, [_vm._v("Price")]),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.newProduct.price,
+                      expression: "newProduct.price"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", id: "price", placeholder: "Price" },
+                  domProps: { value: _vm.newProduct.price },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.newProduct, "price", $event.target.value)
+                    }
+                  }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-row" }, [
+              _c("div", { staticClass: "form-group col-md-12" }, [
+                _c("label", { attrs: { for: "description" } }, [
+                  _vm._v("Description")
+                ]),
+                _vm._v(" "),
+                _c("textarea", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.newProduct.description,
+                      expression: "newProduct.description"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { name: "description", id: "description" },
+                  domProps: { value: _vm.newProduct.description },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.newProduct,
+                        "description",
+                        $event.target.value
+                      )
+                    }
+                  }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "form-row" }, [
+              _c("div", { staticClass: "form-group col-md-12" }, [
+                _vm._v("\n\t\t\t\t\t\t\tIn Stock: \n\t\t\t\t\t\t\t"),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "custom-control custom-radio custom-control-inline"
+                  },
+                  [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.newProduct.availability,
+                          expression: "newProduct.availability"
+                        }
+                      ],
+                      staticClass: "custom-control-input",
+                      attrs: {
+                        type: "radio",
+                        id: "yes",
+                        name: "availability",
+                        value: "1"
+                      },
+                      domProps: {
+                        checked: _vm._q(_vm.newProduct.availability, "1")
+                      },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(_vm.newProduct, "availability", "1")
+                        }
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "label",
+                      {
+                        staticClass: "custom-control-label",
+                        attrs: { for: "yes" }
+                      },
+                      [_vm._v("Yes")]
+                    )
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "custom-control custom-radio custom-control-inline"
+                  },
+                  [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.newProduct.availability,
+                          expression: "newProduct.availability"
+                        }
+                      ],
+                      staticClass: "custom-control-input",
+                      attrs: {
+                        type: "radio",
+                        id: "no",
+                        name: "availability",
+                        value: "0"
+                      },
+                      domProps: {
+                        checked: _vm._q(_vm.newProduct.availability, "0")
+                      },
+                      on: {
+                        change: function($event) {
+                          _vm.$set(_vm.newProduct, "availability", "0")
+                        }
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "label",
+                      {
+                        staticClass: "custom-control-label",
+                        attrs: { for: "no" }
+                      },
+                      [_vm._v("No")]
+                    )
+                  ]
+                )
+              ])
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-footer" }, [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { type: "submit" },
+              on: { click: _vm.saveProduct }
+            },
+            [_vm._v("Save")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-info",
+              attrs: { type: "submit" },
+              on: { click: _vm.resetForm }
+            },
+            [_vm._v("Reset")]
+          )
+        ])
+      ])
+    ])
+  ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-md-12 justify-content-center" }, [
+      _c("h1", [_vm._v("Products")])
+    ])
+  }
+]
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
